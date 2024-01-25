@@ -548,6 +548,9 @@ public:
     bool operator==(const basic_array<string_t>& rhs) const;
     bool operator!=(const basic_array<string_t>& rhs) const { return !(*this == rhs); }
 
+    template <typename... args_t>
+    static basic_array<string_t> make(args_t&&... args);
+
 private:
     template <typename... key_then_default_value_t, size_t... keys_indexes_t>
     auto get(std::tuple<key_then_default_value_t...> keys_then_default_value,
@@ -558,6 +561,11 @@ private:
     auto get_helper(const value_t& default_value, size_t pos) const;
 
     string_t format(size_t indent, size_t indent_times) const;
+
+    static void make_helper(basic_array<string_t>& arr);
+
+    template <typename value_t, typename... args_t>
+    static void make_helper(basic_array<string_t>& arr, value_t&& val, args_t&&... args);
 
 private:
     raw_array _array_data;
@@ -663,6 +671,9 @@ public:
     bool operator==(const basic_object<string_t>& rhs) const;
     bool operator!=(const basic_object<string_t>& rhs) const { return !(*this == rhs); }
 
+    template <typename... args_t>
+    static basic_object<string_t> make(args_t&&... args);
+
 private:
     template <typename... key_then_default_value_t, size_t... keys_indexes_t>
     auto get(std::tuple<key_then_default_value_t...> keys_then_default_value,
@@ -673,6 +684,11 @@ private:
     auto get_helper(const value_t& default_value, const string_t& key) const;
 
     string_t format(size_t indent, size_t indent_times) const;
+
+    static void make_helper(basic_object<string_t>& obj);
+
+    template <typename key_t, typename value_t, typename... args_t>
+    static void make_helper(basic_object<string_t>& obj, key_t&& key, value_t&& val, args_t&&... args);
 
 private:
     raw_object _object_data;
@@ -1887,6 +1903,26 @@ inline bool basic_array<string_t>::operator==(const basic_array<string_t>& rhs) 
     return _array_data == rhs._array_data;
 }
 
+template <typename string_t>
+template <typename... args_t>
+inline basic_array<string_t> basic_array<string_t>::make(args_t&&... args) {
+    basic_array<string_t> arr;
+    make_helper(arr, std::forward<args_t>(args)...);
+    return arr;
+}
+
+template <typename string_t>
+inline void basic_array<string_t>::make_helper(basic_array<string_t>& ) {
+    return;
+}
+
+template <typename string_t>
+template <typename value_t, typename... args_t>
+inline void basic_array<string_t>::make_helper(basic_array<string_t>& arr, value_t&& val, args_t&&... args) {
+    arr.emplace_back(std::forward<value_t>(val));
+    make_helper(arr, std::forward<args_t>(args)...);
+}
+
 // *******************************
 // *      basic_object impl      *
 // *******************************
@@ -2179,6 +2215,26 @@ template <typename string_t>
 inline bool basic_object<string_t>::operator==(const basic_object<string_t>& rhs) const
 {
     return _object_data == rhs._object_data;
+}
+
+template <typename string_t>
+template <typename... args_t>
+inline basic_object<string_t> basic_object<string_t>::make(args_t&&... args) {
+    basic_object<string_t> obj;
+    make_helper(obj, std::forward<args_t>(args)...);
+    return obj;
+}
+
+template <typename string_t>
+inline void basic_object<string_t>::make_helper(basic_object<string_t>& ) {
+    return;
+}
+
+template <typename string_t>
+template <typename key_t, typename value_t, typename... args_t>
+inline void basic_object<string_t>::make_helper(basic_object<string_t>& obj, key_t&& key, value_t&& val, args_t&&... args) {
+    obj.insert(std::forward<key_t>(key), std::forward<value_t>(val));
+    make_helper(obj, std::forward<args_t>(args)...);
 }
 
 // *************************

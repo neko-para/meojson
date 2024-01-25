@@ -12,13 +12,23 @@
 void serializing();
 void third_party_jsonization();
 void parsing();
+void literal();
 
 int main()
 {
+    literal();
+    return 0;
     serializing();
     parsing();
 
     return 0;
+}
+
+void literal() {
+    auto obj = json::object::make("abc", 123, "def", "456", "ghi", json::object { { "1", 2 } });
+    auto arr = json::array::make("1", 2, 3.f, json::object::make("k1", 4));
+    std::cout << obj.format(2) << std::endl;
+    std::cout << arr.format(2) << std::endl;
 }
 
 void serializing()
