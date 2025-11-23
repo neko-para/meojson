@@ -1,12 +1,18 @@
 cmake_minimum_required(VERSION 3.14)
 project(meojson CXX)
 
-option(BUILD_SAMPLE "Build sample in sample/sample.cpp" ON)
+option(BUILD_SAMPLE "Build sample in sample/sample.cpp" OFF)
 option(BUILD_BENCHMARK "Build benchmark in benchmark/benchmark.cpp" OFF)
 option(ENABLE_NEON "Enable ARM NEON" OFF)
-option(BUILD_TESTING "Build testing" ON)
+option(BUILD_TESTING "Build testing" OFF)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_executable(new_test test-new/main.cpp test-new/model.cpp)
+target_include_directories(new_test PRIVATE include-20)
+set_target_properties(new_test PROPERTIES EXPORT_COMPILE_COMMANDS ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" OR CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
     add_compile_options("/utf-8" "/W4")

@@ -479,7 +479,8 @@ public:
     value to_json(const std::filesystem::path& path) const
     {
         if constexpr (std::is_same_v<std::string, std::filesystem::path::string_type>) {
-            return path.native();
+            return path.u8string();
+            // return path.native();
         }
         else {
 #if __cplusplus >= 202002L
